@@ -101,7 +101,7 @@ namespace SiestaGames.PlanarReflections
         public bool blurFinalRT = true;
         public float blurOffset = 1.0f;
         public bool limitValue = true;
-        public float maxColorValue = 5.0f;
+        public float maxColorValue = 10.0f;
 
         #endregion
 

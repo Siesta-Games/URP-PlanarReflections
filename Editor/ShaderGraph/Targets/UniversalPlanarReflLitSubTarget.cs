@@ -775,9 +775,9 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         {
             const string kShadows = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl";
             const string kMetaInput = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl";
-            const string kForwardPass = "Assets/Plugins/URP-PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflForwardPass.hlsl"; //"Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/PBRForwardPass.hlsl";
+            const string kForwardPass = PlanarReflectionConstants.PathToHLSL + "PlanarReflForwardPass.hlsl"; //"Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/PBRForwardPass.hlsl";
             const string kGBuffer = "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutput.hlsl";
-            const string kPBRGBufferPass = "Assets/Plugins/URP-PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflGBufferPass.hlsl"; //"Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/PBRGBufferPass.hlsl";
+            const string kPBRGBufferPass = PlanarReflectionConstants.PathToHLSL + "PlanarReflGBufferPass.hlsl"; //"Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/PBRGBufferPass.hlsl";
             const string kLightingMetaPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/LightingMetaPass.hlsl";
             const string k2DPass = "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/PBR2DPass.hlsl";
 

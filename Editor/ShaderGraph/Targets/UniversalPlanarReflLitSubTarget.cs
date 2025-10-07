@@ -179,7 +179,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         public override void GetPropertiesGUI(ref TargetPropertyGUIContext context, Action onChange, Action<String> registerUndo)
         {
             var universalTarget = (target as UniversalTarget);
-            //universalTarget.AddDefaultMaterialOverrideGUI(ref context, onChange, registerUndo);
+            universalTarget.AddDefaultMaterialOverrideGUI(ref context, onChange, registerUndo);
 
             universalTarget.AddDefaultSurfacePropertiesGUI(ref context, onChange, registerUndo, showReceiveShadows: true);
 

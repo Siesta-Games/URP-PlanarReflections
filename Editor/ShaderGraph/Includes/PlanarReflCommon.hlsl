@@ -41,7 +41,7 @@ void InitializePlanarReflData(InputData inputData, SurfaceDescription surfaceDes
 
 void CalculateRoughnessFactor(float roughnessNorm, float threshold, out float progressA, out float progressB)
 {
-    float a = 6.0 * roughnessNorm - threshold;
+    float a = 5.0 * roughnessNorm - threshold;
     float b = a - 1.0;
     float a0 = saturate(1000.0 * a);
     float b0 = saturate(1000.0 * b);
@@ -61,21 +61,21 @@ half3 SampleReflections(half3 normalTS, half2 screenUV, half2 normalDistortion, 
     float progress3A, progress3B;
     float progress2A, progress2B;
     float progress1A, progress1B;
-    float progress0A, progress0B;
     
-    CalculateRoughnessFactor(roughness, 5.0, progress5A, progress5B);
-    CalculateRoughnessFactor(roughness, 4.0, progress4A, progress4B);
-    CalculateRoughnessFactor(roughness, 3.0, progress3A, progress3B);
-    CalculateRoughnessFactor(roughness, 2.0, progress2A, progress2B);
-    CalculateRoughnessFactor(roughness, 1.0, progress1A, progress1B);
-    CalculateRoughnessFactor(roughness, 0.0, progress0A, progress0B);
+    CalculateRoughnessFactor(roughness, 4.0, progress5A, progress5B);
+    CalculateRoughnessFactor(roughness, 3.0, progress4A, progress4B);
+    CalculateRoughnessFactor(roughness, 2.0, progress3A, progress3B);
+    CalculateRoughnessFactor(roughness, 1.0, progress2A, progress2B);
+    CalculateRoughnessFactor(roughness, 0.0, progress1A, progress1B);
+    // NOTE: [Barkley] We override 1B because for roughness 0 it was being 0 when it should be 1 and it's easy to calculate anyway
+    progress1B = saturate(1.0 - roughness * 5.0);
     
     float progress5 = progress5A;
     float progress4 = progress4A + progress5B;
     float progress3 = progress3A + progress4B;
     float progress2 = progress2A + progress3B;
     float progress1 = progress1A + progress2B;
-    float progress0 = progress0A + progress0B + progress1B;
+    float progress0 = progress1B;
     
     reflection += progress5 * SAMPLE_TEXTURE2D(_PlanarReflectionTexture5, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;
     reflection += progress4 * SAMPLE_TEXTURE2D(_PlanarReflectionTexture4, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;
@@ -83,7 +83,7 @@ half3 SampleReflections(half3 normalTS, half2 screenUV, half2 normalDistortion, 
     reflection += progress2 * SAMPLE_TEXTURE2D(_PlanarReflectionTexture2, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;
     reflection += progress1 * SAMPLE_TEXTURE2D(_PlanarReflectionTexture1, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;
     reflection += progress0 * SAMPLE_TEXTURE2D(_PlanarReflectionTexture, sampler_ScreenTextures_linear_clamp, reflectionUV).rgb;
-
+    
     return reflection;
 }
 

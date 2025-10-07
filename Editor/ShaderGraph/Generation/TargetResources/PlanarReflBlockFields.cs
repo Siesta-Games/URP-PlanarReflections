@@ -1,5 +1,3 @@
-#if ENABLE_PLANAR_REFLECTIONS_IN_SHADERGRAPH
-
 namespace UnityEditor.ShaderGraph
 {
 
@@ -22,5 +20,3 @@ namespace UnityEditor.ShaderGraph
     }
 
 }
-
-#endif

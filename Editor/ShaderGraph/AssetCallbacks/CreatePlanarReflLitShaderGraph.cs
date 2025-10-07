@@ -1,5 +1,3 @@
-#if ENABLE_PLANAR_REFLECTIONS_IN_SHADERGRAPH
-
 using System;
 using UnityEditor.ShaderGraph;
 using UnityEngine.Rendering;
@@ -36,5 +34,3 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
         }
     }
 }
-
-#endif

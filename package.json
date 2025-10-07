@@ -1,0 +1,17 @@
+{
+  "name": "com.siestagames.urpplanarreflections",
+  "version": "1.0.0",
+  "displayName": "URP Planar Reflections",
+  "description": "Planar Reflections for Unity 6.0 and above. Integrated into URP.",
+  "unity": "6000.0",
+  "unityRelease": "0f1",
+  "keywords": [
+    "reflections",
+	"planar",
+  ],
+  "author": {
+    "name": "Eduardo Jimenez (Siesta Games)",
+    "email": "contact@siesta-games.com",
+    "url": "https://siesta-games.com/"
+  }
+}

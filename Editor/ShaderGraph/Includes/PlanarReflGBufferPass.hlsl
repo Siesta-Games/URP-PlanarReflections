@@ -1,4 +1,4 @@
-#include "Assets/Shared/PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflCommon.hlsl"
+#include "Assets/Plugins/URP-PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflCommon.hlsl"
 
 void InitializeInputData(Varyings input, SurfaceDescription surfaceDescription, out InputData inputData)
 {

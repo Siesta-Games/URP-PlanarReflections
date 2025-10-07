@@ -1,4 +1,4 @@
-#include "Assets/Shared/PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflCommon.hlsl"
+#include "Assets/Plugins/URP-PlanarReflections/Editor/ShaderGraph/Includes/PlanarReflCommon.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl"
 
 

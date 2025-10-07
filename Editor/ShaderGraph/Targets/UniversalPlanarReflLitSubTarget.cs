@@ -132,10 +132,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             // when target controlled, we can cull the unnecessary blocks
             context.AddBlock(BlockFields.SurfaceDescription.Metallic);
 
-            context.AddBlock(PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection);
             context.AddBlock(PlanarReflBlockFields.SurfaceDescription.NormalReflectionDistortion);
             context.AddBlock(PlanarReflBlockFields.SurfaceDescription.ReflectionMultiplier);
             context.AddBlock(PlanarReflBlockFields.SurfaceDescription.ReflectionPower);
+            //context.AddBlock(PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection);
 
             context.AddBlock(BlockFields.SurfaceDescription.Alpha, (target.surfaceType == SurfaceType.Transparent || target.alphaClip) || target.allowMaterialOverride);
             context.AddBlock(BlockFields.SurfaceDescription.AlphaClipThreshold, (target.alphaClip) || target.allowMaterialOverride);
@@ -252,10 +252,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 { BlockFields.SurfaceDescription.Occlusion, 6 },
                 { BlockFields.SurfaceDescription.Alpha, 7 },
                 { BlockFields.SurfaceDescription.AlphaClipThreshold, 8 },
-                { PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection, 12 },
-                { PlanarReflBlockFields.SurfaceDescription.NormalReflectionDistortion, 13 },
-                { PlanarReflBlockFields.SurfaceDescription.ReflectionMultiplier, 14 },
-                { PlanarReflBlockFields.SurfaceDescription.ReflectionPower, 15 },
+                { PlanarReflBlockFields.SurfaceDescription.NormalReflectionDistortion, 12 },
+                { PlanarReflBlockFields.SurfaceDescription.ReflectionMultiplier, 13 },
+                { PlanarReflBlockFields.SurfaceDescription.ReflectionPower, 14 },
+                //{ PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection, 15 },
             };
 
             return true;
@@ -620,10 +620,10 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFields.SurfaceDescription.Occlusion,
                 BlockFields.SurfaceDescription.Alpha,
                 BlockFields.SurfaceDescription.AlphaClipThreshold,
-                PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection,
                 PlanarReflBlockFields.SurfaceDescription.NormalReflectionDistortion,
                 PlanarReflBlockFields.SurfaceDescription.ReflectionMultiplier,
                 PlanarReflBlockFields.SurfaceDescription.ReflectionPower,
+                //PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection,
             };
 
             public static readonly BlockFieldDescriptor[] FragmentMeta = new BlockFieldDescriptor[]

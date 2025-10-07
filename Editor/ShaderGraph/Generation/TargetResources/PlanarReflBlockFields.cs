@@ -7,8 +7,8 @@ namespace UnityEditor.ShaderGraph
         public struct SurfaceDescription
         {
             public static string name = "SurfaceDescription";
-            public static BlockFieldDescriptor MinPlanarReflection = new BlockFieldDescriptor(SurfaceDescription.name, "MinPlanarReflection", "SURFACEDESCRIPTION_MINPLANARREFLECTION",
-                new FloatControl(0.0f), ShaderStage.Fragment);
+            //public static BlockFieldDescriptor MinPlanarReflection = new BlockFieldDescriptor(SurfaceDescription.name, "MinPlanarReflection", "SURFACEDESCRIPTION_MINPLANARREFLECTION",
+            //    new FloatControl(0.0f), ShaderStage.Fragment);
             public static BlockFieldDescriptor NormalReflectionDistortion = new BlockFieldDescriptor(SurfaceDescription.name, "NormalReflectionDistortion", "SURFACEDESCRIPTION_NORMALREFLECTIONDISTORTION",
                 new FloatControl(0.0f), ShaderStage.Fragment);
             public static BlockFieldDescriptor ReflectionMultiplier = new BlockFieldDescriptor(SurfaceDescription.name, "ReflectionMultiplier", "SURFACEDESCRIPTION_REFLECTIONMULTIPLIER",

@@ -108,9 +108,8 @@ namespace SiestaGames.PlanarReflections
         #region Private Attributes
 
         // NOTE: [Barkley] Sometimes it's useful to see the textures in the editor
-        /*[SerializeField]*/
         private RenderTexture reflectionTexture = null;
-        /*[SerializeField]*/ private RenderTexture[] reflTexBlur = null;
+        private RenderTexture[] reflTexBlur = null;
 
         private static Camera reflectionCamera;
         private static bool renderingPlanarReflections = false;

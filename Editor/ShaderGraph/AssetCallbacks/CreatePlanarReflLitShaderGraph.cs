@@ -24,7 +24,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 BlockFields.SurfaceDescription.Smoothness,
                 BlockFields.SurfaceDescription.Emission,
                 BlockFields.SurfaceDescription.Occlusion,
-                PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection,
+                //PlanarReflBlockFields.SurfaceDescription.MinPlanarReflection,
                 PlanarReflBlockFields.SurfaceDescription.NormalReflectionDistortion,
                 PlanarReflBlockFields.SurfaceDescription.ReflectionMultiplier,
                 PlanarReflBlockFields.SurfaceDescription.ReflectionPower,

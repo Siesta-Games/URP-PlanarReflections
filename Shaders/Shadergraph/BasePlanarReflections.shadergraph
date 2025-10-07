@@ -16,9 +16,6 @@
             "m_Id": "d34711fa37434d7990d3ff77c797666b"
         },
         {
-            "m_Id": "501e131fcbb34b7d8efc05dc2dfc7137"
-        },
-        {
             "m_Id": "9fab125b1c274dde90c431a0329323e1"
         },
         {
@@ -106,9 +103,6 @@
             "m_Id": "025a93d1a7c24e3fbdc12bbb010768f9"
         },
         {
-            "m_Id": "a8517db9a26a4de09be4c7e64d277774"
-        },
-        {
             "m_Id": "eec8c4f705554779bd8c703536a8bfd5"
         },
         {
@@ -143,9 +137,6 @@
         },
         {
             "m_Id": "fab9b338887f4d529b2d15f0e51aadfd"
-        },
-        {
-            "m_Id": "4d89ca2f898045159622c47629916ca9"
         },
         {
             "m_Id": "93756715eb41456785accb308cdb21e0"
@@ -401,20 +392,6 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
-                    "m_Id": "a8517db9a26a4de09be4c7e64d277774"
-                },
-                "m_SlotId": 0
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "4d89ca2f898045159622c47629916ca9"
-                },
-                "m_SlotId": 0
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
                     "m_Id": "b4c2863dab4d4a99b22a39fa72b161cd"
                 },
                 "m_SlotId": 0
@@ -529,9 +506,6 @@
             },
             {
                 "m_Id": "ed0833276e4345cd81cab0a7d8c7145d"
-            },
-            {
-                "m_Id": "4d89ca2f898045159622c47629916ca9"
             },
             {
                 "m_Id": "93756715eb41456785accb308cdb21e0"
@@ -797,9 +771,6 @@
     "m_ObjectId": "1824b261471940bb9be97126316b39a4",
     "m_Name": "Planar Reflections",
     "m_ChildObjectList": [
-        {
-            "m_Id": "501e131fcbb34b7d8efc05dc2dfc7137"
-        },
         {
             "m_Id": "9a1d2e6a0980433086758ce2ce2f4da7"
         },
@@ -1458,40 +1429,6 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
-    "m_ObjectId": "4d89ca2f898045159622c47629916ca9",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "SurfaceDescription.MinPlanarReflection",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "66e3d2934fda4baea0ed9a76c52ad265"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedDescriptor": "SurfaceDescription.MinPlanarReflection"
-}
-
-{
-    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Texture2DInputMaterialSlot",
     "m_ObjectId": "4f39d331c816489b903d11295f9ff1fd",
     "m_Id": 2139222923,
@@ -1506,46 +1443,6 @@
         "m_Guid": ""
     },
     "m_DefaultType": 0
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
-    "m_ObjectId": "501e131fcbb34b7d8efc05dc2dfc7137",
-    "m_Guid": {
-        "m_GuidSerialized": "9d9a2e57-d4e1-401e-a335-3fb431248dc5"
-    },
-    "m_Name": "MinPlanarReflection",
-    "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "MinPlanarReflection",
-    "m_DefaultReferenceName": "_MinPlanarReflection",
-    "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
-    "m_UseCustomSlotLabel": false,
-    "m_CustomSlotLabel": "",
-    "m_DismissedVersion": 0,
-    "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
-    "m_Hidden": false,
-    "m_PerRendererData": false,
-    "m_customAttributes": [],
-    "m_Value": 0.0,
-    "m_FloatType": 1,
-    "m_RangeValues": {
-        "x": 0.0,
-        "y": 1.0
-    },
-    "m_SliderType": 0,
-    "m_SliderPower": 3.0,
-    "m_EnumType": 0,
-    "m_CSharpEnumString": "",
-    "m_EnumNames": [
-        "Default"
-    ],
-    "m_EnumValues": [
-        0
-    ]
 }
 
 {
@@ -1836,21 +1733,6 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.Alpha"
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "66e3d2934fda4baea0ed9a76c52ad265",
-    "m_Id": 0,
-    "m_DisplayName": "MinPlanarReflection",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "MinPlanarReflection",
-    "m_StageCapability": 2,
-    "m_Value": 0.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
 }
 
 {
@@ -2441,42 +2323,6 @@
     },
     "m_Property": {
         "m_Id": "340958b2fb3e4854b8af43a257e3bbce"
-    }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
-    "m_ObjectId": "a8517db9a26a4de09be4c7e64d277774",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Property",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 196.0,
-            "y": 111.99999237060547,
-            "width": 178.99996948242188,
-            "height": 34.00000762939453
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "efc908f9e04544cb840aac139a77ce3f"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_Property": {
-        "m_Id": "501e131fcbb34b7d8efc05dc2dfc7137"
     }
 }
 
@@ -3158,21 +3004,6 @@
     "m_Property": {
         "m_Id": "9a1d2e6a0980433086758ce2ce2f4da7"
     }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "efc908f9e04544cb840aac139a77ce3f",
-    "m_Id": 0,
-    "m_DisplayName": "MinPlanarReflection",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "Out",
-    "m_StageCapability": 3,
-    "m_Value": 0.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
 }
 
 {

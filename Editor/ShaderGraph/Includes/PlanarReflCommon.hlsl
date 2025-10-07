@@ -13,7 +13,7 @@ struct PlanarReflInfo
 {
     float2 screenUV;
     half3 normalTS;
-    float minReflection;
+    //float minReflection;
     float normalDistortion;
     float reflectionMultiplier;
     float reflectionPower;
@@ -33,7 +33,7 @@ void InitializePlanarReflData(InputData inputData, SurfaceDescription surfaceDes
     planarReflInfo.normalTS = half3(0, 0, 1);
 #endif
 
-    planarReflInfo.minReflection = surfaceDescription.MinPlanarReflection;
+    //planarReflInfo.minReflection = surfaceDescription.MinPlanarReflection;
     planarReflInfo.normalDistortion = surfaceDescription.NormalReflectionDistortion;
     planarReflInfo.reflectionMultiplier = surfaceDescription.ReflectionMultiplier;
     planarReflInfo.reflectionPower = surfaceDescription.ReflectionPower;

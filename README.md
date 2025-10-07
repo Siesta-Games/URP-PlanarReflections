@@ -10,7 +10,7 @@ Unity 6000.0, 6000.1, or 6000.2 along with its corresponding URP version.
 * Works in forward, deferred, forward+, and deferred+ paths.
 * High quality blurring to support different levels of smoothness, seamlessly interpolated.
 
-(https://github.com/Siesta-Games/ReadmeImages/blob/main/URP-PlanarReflections/Throneroom01.jpg)
+![Throneroom01](https://github.com/Siesta-Games/ReadmeImages/blob/main/URP-PlanarReflections/Throneroom01.jpg)
 
 # Installation
 

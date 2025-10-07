@@ -1,0 +1,18 @@
+{
+    "name": "PlanarReflections.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:37bcc21526b0fe044a73963c28c9faff"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

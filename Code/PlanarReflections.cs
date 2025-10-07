@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Experimental.Rendering;
@@ -121,6 +122,9 @@ namespace SiestaGames.PlanarReflections
         #region Properties
 
         public static bool RenderingPlanarReflections { get { return renderingPlanarReflections; } }
+
+        public RenderTexture ReflectionTexture => reflectionTexture;
+        public ReadOnlyCollection<RenderTexture> ReflectionTexsBlur => new ReadOnlyCollection<RenderTexture>(reflTexBlur);
 
         #endregion
 

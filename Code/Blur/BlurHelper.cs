@@ -8,6 +8,7 @@ namespace SiestaGames.PlanarReflections
     {
         private static readonly int blitTextureId = Shader.PropertyToID("_BlitTexture");
         private static readonly int offsetId = Shader.PropertyToID("_Offset");
+        private static readonly int maxValueId = Shader.PropertyToID("_MaxValue");
 
         /// <summary>
         /// Does and downsampling and upsampling using the given material that should have the Dual-Kawase Blur shader
@@ -73,6 +74,8 @@ namespace SiestaGames.PlanarReflections
         {
             RenderTexture tempRT = RenderTexture.GetTemporary(rt.descriptor);
 
+            blurMat.SetTexture(blitTextureId, rt);
+            blurMat.SetFloat(maxValueId, maxValue);
             Graphics.Blit(rt, tempRT, blurMat, 2);
             Graphics.Blit(tempRT, rt);
 

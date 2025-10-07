@@ -1,8 +1,9 @@
-Shader "Custom/Dual-Kawase Blur"
+Shader "Blur/Dual-Kawase Blur"
 {   
 	Properties
 	{
-        _Offset("Offset", Float) = 1.0
+        _Offset("Offset", Range(0.0, 1.0)) = 1.0
+        _MaxValue("Max (Color) Value", Float) = 5.0
 	}
 
     SubShader
@@ -12,6 +13,7 @@ Shader "Custom/Dual-Kawase Blur"
         #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
         uniform float _Offset;
+        uniform float _MaxValue;
 
         struct BlurAttributes
         {
@@ -125,6 +127,31 @@ Shader "Custom/Dual-Kawase Blur"
 
                 // normalize
                 color *= (1.0 / 12.0);
+
+                return color;
+            }
+            
+            ENDHLSL
+        }
+
+        Pass        //< Pass 2: Simple pass to limit the value of pixels
+        {
+            Name "Limit Color Values"
+            ZWrite Off Cull Off
+            Fog { Mode off }
+
+            HLSLPROGRAM
+            
+            #pragma vertex BlurVert
+            #pragma fragment FragLimitValue
+
+            float4 FragLimitValue (BlurVaryings input) : SV_Target
+            {
+                float4 color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, input.uv);
+
+                color.r = min(color.r, _MaxValue);
+                color.g = min(color.g, _MaxValue);
+                color.b = min(color.b, _MaxValue);
 
                 return color;
             }

@@ -65,6 +65,19 @@ namespace SiestaGames.PlanarReflections
                 RenderTexture.ReleaseTemporary(subRTs[i]);
             subRTs = null;
         }
+
+        /// <summary>
+        /// Limits the color value using the 3rd pass (Pass 2) of the Dual-Kawase blur shader on the given render texture
+        /// </summary>
+        public static void LimitColorValue(RenderTexture rt, Material blurMat, float maxValue)
+        {
+            RenderTexture tempRT = RenderTexture.GetTemporary(rt.descriptor);
+
+            Graphics.Blit(rt, tempRT, blurMat, 2);
+            Graphics.Blit(tempRT, rt);
+
+            RenderTexture.ReleaseTemporary(tempRT);
+        }
     }
 
 }

@@ -97,13 +97,18 @@ namespace SiestaGames.PlanarReflections
         public float planeOffset = 0.01f;
 
         public Shader dualKawaseBlurShader;
+        public bool blurFinalRT = true;
+        public float blurOffset = 1.0f;
+        public bool limitValue = true;
+        public float maxColorValue = 5.0f;
 
         #endregion
 
         #region Private Attributes
 
         // NOTE: [Barkley] Sometimes it's useful to see the textures in the editor
-        /*[SerializeField]*/ private RenderTexture reflectionTexture = null;
+        /*[SerializeField]*/
+        private RenderTexture reflectionTexture = null;
         /*[SerializeField]*/ private RenderTexture[] reflTexBlur = null;
 
         private static Camera reflectionCamera;
@@ -532,19 +537,41 @@ namespace SiestaGames.PlanarReflections
             if (camera != reflectionCamera)
                 return;
 
-            Profiler.BeginSample("Reflection Blurring");
+            if (limitValue)
+            {
+                Profiler.BeginSample("Limit Color Value");
 
-            // do the blurring for further roughness levels
-            BlurHelper.DualKawaseBlur(reflectionTexture, ref reflTexBlur, dualKawaseBlurMat, 1.0f);
+                // limit the colors to a maximum value on the resulting render target
+                BlurHelper.LimitColorValue(reflectionTexture, dualKawaseBlurMat, maxColorValue);
 
-            // assign the blurred textures to the global shader parameters
-            Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflTexBlur[0]);
-            Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflTexBlur[1]);
-            Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflTexBlur[2]);
-            Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflTexBlur[3]);
-            Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflTexBlur[4]);
+                Profiler.EndSample();
+            }
 
-            Profiler.EndSample();
+            if (blurFinalRT)
+            {
+                Profiler.BeginSample("Reflection Blurring");
+
+                // do the blurring for further roughness levels
+                BlurHelper.DualKawaseBlur(reflectionTexture, ref reflTexBlur, dualKawaseBlurMat, 1.0f);
+
+                // assign the blurred textures to the global shader parameters
+                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflTexBlur[0]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflTexBlur[1]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflTexBlur[2]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflTexBlur[3]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflTexBlur[4]);
+
+                Profiler.EndSample();
+            }
+            else
+            {
+                // set the reflection texture to all levels of reflection texture
+                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflectionTexture);
+            }
         }
 
         #endregion

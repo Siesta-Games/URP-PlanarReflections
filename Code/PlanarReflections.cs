@@ -135,7 +135,7 @@ namespace SiestaGames.PlanarReflections
             RenderPipelineManager.endCameraRendering += OnFinishedRenderingCamera;
 
             if (dualKawaseBlurShader == null)
-                dualKawaseBlurShader = Shader.Find("Custom/Dual-Kawase Blur");
+                dualKawaseBlurShader = Shader.Find("Blur/Dual-Kawase Blur");
             dualKawaseBlurMat = new Material(dualKawaseBlurShader);
         }
 

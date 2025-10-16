@@ -17,7 +17,7 @@ namespace SiestaGames.PlanarReflections
     /// 
     /// This class is mostly copied from the one with the same name in the BoatAttack project
     /// </summary>
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
 	public class PlanarReflections : MonoBehaviour
 	{
         #region Typedefs
@@ -96,6 +96,7 @@ namespace SiestaGames.PlanarReflections
 
         public int urpCamRendererIndex = -1;
         public float planeOffset = 0.01f;
+        public LayerMask cameraLayersToIgnore = 0;
 
         public Shader dualKawaseBlurShader;
         public bool blurFinalRT = true;
@@ -108,6 +109,7 @@ namespace SiestaGames.PlanarReflections
         #region Private Attributes
 
         // NOTE: [Barkley] Sometimes it's useful to see the textures in the editor
+        private RenderTexture renderTexture = null;
         private RenderTexture reflectionTexture = null;
         private RenderTexture[] reflTexBlur = null;
 
@@ -131,12 +133,16 @@ namespace SiestaGames.PlanarReflections
 
         private void OnEnable()
         {
-            RenderPipelineManager.beginCameraRendering += OnExecutePlanarReflections;
-            RenderPipelineManager.endCameraRendering += OnFinishedRenderingCamera;
+            RenderPipelineManager.beginCameraRendering += OnBeginRenderingCamera;
+            RenderPipelineManager.endCameraRendering += OnFinishedRenderingPlanarReflCamera;
 
             if (dualKawaseBlurShader == null)
                 dualKawaseBlurShader = Shader.Find("Blur/Dual-Kawase Blur");
             dualKawaseBlurMat = new Material(dualKawaseBlurShader);
+
+            if (reflectionCamera == null)
+                reflectionCamera = CreatePlanarReflectionsCamera();
+            PlanarReflectionTexture(reflectionCamera);
         }
 
         // Cleanup all the objects we possibly have created
@@ -208,13 +214,19 @@ namespace SiestaGames.PlanarReflections
         /// </summary>
         private void Cleanup()
         {
-            RenderPipelineManager.beginCameraRendering -= OnExecutePlanarReflections;
-            RenderPipelineManager.endCameraRendering -= OnFinishedRenderingCamera;
+            RenderPipelineManager.beginCameraRendering -= OnBeginRenderingCamera;
+            RenderPipelineManager.endCameraRendering -= OnFinishedRenderingPlanarReflCamera;
 
             if (reflectionCamera != null)
             {
                 reflectionCamera.targetTexture = null;
                 SafeDestroy(reflectionCamera.gameObject);
+            }
+            if (renderTexture != null)
+            {
+                renderTexture.DiscardContents();
+                renderTexture.Release();
+                renderTexture = null;
             }
             if (reflectionTexture != null)
             {
@@ -243,27 +255,20 @@ namespace SiestaGames.PlanarReflections
             if (reflectionCamera == null)
                 return;
 
+            if (renderTexture != null)
+                PerformPostRenderOperations();
+
             Profiler.BeginSample("Render Planar Reflections");
 
-            //UpdateReflectionCamera(camera);     // create or update reflected camera
-            //PlanarReflectionTexture(camera);    // create and assign RenderTexture
+            //var data = new PlanarReflectionSettingData(); // save quality settings and lower them for the planar reflections
+            //data.Set(); // set quality settings
 
-            var data = new PlanarReflectionSettingData(); // save quality settings and lower them for the planar reflections
-            data.Set(); // set quality settings
-
-            renderingPlanarReflections = true;
-            if (BeginPlanarReflections != null)
-                BeginPlanarReflections(reflectionCamera);                  // callback Action for PlanarReflection
-
-            UniversalRenderPipeline.SingleCameraRequest requestData = new UniversalRenderPipeline.SingleCameraRequest();
-            requestData.destination = reflectionTexture;
+            /*UniversalRenderPipeline.SingleCameraRequest requestData = new UniversalRenderPipeline.SingleCameraRequest();
+            requestData.destination = renderTexture;
             Assert.IsTrue(UniversalRenderPipeline.SupportsRenderRequest<UniversalRenderPipeline.SingleCameraRequest>(reflectionCamera, requestData), "Error! The system doesn't support the render request of another camera?!");
-            UniversalRenderPipeline.SubmitRenderRequest(reflectionCamera, requestData);
+            UniversalRenderPipeline.SubmitRenderRequest(reflectionCamera, requestData);*/
 
-            renderingPlanarReflections = false;
-
-            data.Restore(); // restore the quality settings
-            Shader.SetGlobalTexture(PlanarReflectionTextureId, reflectionTexture);  // Assign texture to water shader
+            //data.Restore(); // restore the quality settings
 
             Profiler.EndSample();
         }
@@ -394,11 +399,17 @@ namespace SiestaGames.PlanarReflections
 
             // Setup oblique projection matrix so that near plane is our reflection
             // plane. This way we clip everything below/above it for free.
-            var clipPlane = CameraSpacePlane(reflectionCamera, pos - Vector3.up * 0.1f, normal, 1.0f);
+            var clipPlane = CameraSpacePlane(reflectionCamera, pos - Vector3.up * 0.01f, normal, 1.0f);
             var projection = realCamera.CalculateObliqueMatrix(clipPlane);
             reflectionCamera.projectionMatrix = projection;
             reflectionCamera.cullingMask = settings.reflectLayers; // never render water layer
             reflectionCamera.transform.position = newPosition;
+
+            reflectionCamera.targetTexture = renderTexture;
+
+            var camData = reflectionCamera.GetComponent<UniversalAdditionalCameraData>();
+            camData.allowHDROutput = true;
+            camData.stopNaN = true;
         }
 
         /// <summary>
@@ -407,7 +418,7 @@ namespace SiestaGames.PlanarReflections
         /// <returns></returns>
         private Camera CreatePlanarReflectionsCamera()
         {
-            GameObject go = new GameObject("Planar Reflections", typeof(Camera));
+            GameObject go = new GameObject("Planar Reflections Camera", typeof(Camera));
             UniversalAdditionalCameraData cameraData = go.AddComponent(typeof(UniversalAdditionalCameraData)) as UniversalAdditionalCameraData;
 
             cameraData.requiresColorOption = CameraOverrideOption.Off;
@@ -420,8 +431,9 @@ namespace SiestaGames.PlanarReflections
             reflectionCamera.transform.SetParent(t);
             reflectionCamera.transform.SetPositionAndRotation(t.position, t.rotation);
             reflectionCamera.depth = -10;
-            reflectionCamera.enabled = false;
-            go.hideFlags = HideFlags.HideAndDontSave;//HideFlags.DontSave;
+            reflectionCamera.enabled = true;//false;
+            reflectionCamera.targetTexture = renderTexture;
+            go.hideFlags = HideFlags.DontSave;//HideFlags.HideAndDontSave;
 
             return reflectionCamera;
         }
@@ -435,7 +447,7 @@ namespace SiestaGames.PlanarReflections
             switch (settings.resolutionMultiplier)
             {
                 case ResolutionMulltiplier.Full:
-                    return 1f;
+                    return 1.0f;
                 case ResolutionMulltiplier.Half:
                     return 0.5f;
                 case ResolutionMulltiplier.Third:
@@ -475,6 +487,9 @@ namespace SiestaGames.PlanarReflections
                 reflectionTexture.DiscardContents();
                 reflectionTexture.Release();
                 reflectionTexture = null;
+                renderTexture.DiscardContents();
+                renderTexture.Release();
+                renderTexture = null;
 
                 for (int i = 0; i < reflTexBlur.Length; ++i)
                 {
@@ -489,66 +504,59 @@ namespace SiestaGames.PlanarReflections
             {
                 //reflectionTexture = RenderTexture.GetTemporary(res.x, res.y, 16,
                 //    GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
+#if UNITY_GAMECORE
+                RenderTextureFormat hdrFormat = RenderTextureFormat.DefaultHDR;
+                RenderTextureFormat reflTexFormat = RenderTextureFormat.Default;
+#else
                 bool useHdr10 = RenderingUtils.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float);
                 RenderTextureFormat hdrFormat = useHdr10 ? RenderTextureFormat.RGB111110Float : RenderTextureFormat.DefaultHDR;
-                reflectionTexture = new RenderTexture(res.x, res.y, 16,
-                    GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
-                reflectionTexture.name = "Planar Reflection RT";
+#endif
+                GraphicsFormat graphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true);
+                GraphicsFormat reflGraphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(reflTexFormat, true);
+                Debug.LogFormat("Creating planar reflections RTs with format {0} (from {1})", graphicsFormat, hdrFormat);
+                reflectionTexture = new RenderTexture(res.x, res.y, 16, reflGraphicsFormat);
+                reflectionTexture.name = "Planar Reflection Texture";
                 reflectionTexture.useMipMap = false;
                 reflectionTexture.autoGenerateMips = false;
+                renderTexture = new RenderTexture(res.x, res.y, 16, graphicsFormat);
+                renderTexture.name = "Planar Reflection Render Target";
+                renderTexture.useMipMap = false;
+                renderTexture.autoGenerateMips = false;
 
                 reflTexBlur = new RenderTexture[5];
                 for (int i = 0; i < reflTexBlur.Length; ++i)
                 {
-                    reflTexBlur[i] = new RenderTexture(res.x / 2, res.y / 2, 0, GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
+                    reflTexBlur[i] = new RenderTexture(res.x / 2, res.y / 2, 0, reflGraphicsFormat);
                     reflTexBlur[i].name = $"Planar Reflection RT Blur {i + 1}";
                     reflTexBlur[i].useMipMap = false;
                     reflTexBlur[i].autoGenerateMips = false;
                 }
             }
-            reflectionCamera.targetTexture = reflectionTexture;
+            reflectionCamera.targetTexture = renderTexture;
         }
-
-        #endregion
-
-        #region Callbacks
 
         /// <summary>
-        /// Callback for when the rendering starts so that we can render the reflection camera before the normal rendering so that 
-        /// we can use the reflection texture for the rendering of other objects
+        /// Performs the post-render operations: limit the texture values, blurring, assigning to shader constants, etc.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="camera"></param>
-        private void OnExecutePlanarReflections(ScriptableRenderContext context, Camera camera)
+        private void PerformPostRenderOperations()
         {
-            // we dont want to render planar reflections in reflections or previews
-            if (camera.cameraType == CameraType.Reflection || camera.cameraType == CameraType.Preview || camera == reflectionCamera)
-                return;
-
-            // don't do reflections for the overlay cameras
-            UniversalAdditionalCameraData camData = camera.GetComponent<UniversalAdditionalCameraData>();
-            if (camData != null && camData.renderType == CameraRenderType.Overlay)
-                return;
-
-            // create or update the reflection camera to the given camera
-            UpdateReflectionCamera(camera);     // create or update reflected camera
-            PlanarReflectionTexture(camera);    // create and assign RenderTexture
-        }
-
-        private void OnFinishedRenderingCamera(ScriptableRenderContext context, Camera camera)
-        {
-            if (camera != reflectionCamera)
-                return;
+            Profiler.BeginSample("Post Render Planar Reflections");
 
             if (limitValue)
             {
                 Profiler.BeginSample("Limit Color Value");
 
                 // limit the colors to a maximum value on the resulting render target
-                BlurHelper.LimitColorValue(reflectionTexture, dualKawaseBlurMat, maxColorValue);
+                BlurHelper.LimitColorValue(renderTexture, reflectionTexture, dualKawaseBlurMat, maxColorValue);
 
                 Profiler.EndSample();
             }
+            else
+            {
+                Graphics.Blit(renderTexture, reflectionTexture);
+            }
+
+            Shader.SetGlobalTexture(PlanarReflectionTextureId, reflectionTexture);  // Assign texture to water shader
 
             if (blurFinalRT)
             {
@@ -575,6 +583,56 @@ namespace SiestaGames.PlanarReflections
                 Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflectionTexture);
                 Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflectionTexture);
             }
+
+            Profiler.EndSample();
+        }
+
+#endregion
+
+        #region Callbacks
+
+        /// <summary>
+        /// Callback for when the rendering starts so that we can render the reflection camera before the normal rendering so that 
+        /// we can use the reflection texture for the rendering of other objects
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="camera"></param>
+        private void OnBeginRenderingCamera(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera == reflectionCamera)
+            {
+                // mark as rendering the planar reflections
+                renderingPlanarReflections = true;
+                if (BeginPlanarReflections != null)
+                    BeginPlanarReflections(reflectionCamera);                  // callback Action for PlanarReflection
+                return;
+            }
+
+            int camLayerMask = 1 << camera.gameObject.layer;
+            if ((camLayerMask & cameraLayersToIgnore) != 0)
+                return;
+
+            // we dont want to render planar reflections in reflections or previews
+            if (camera.cameraType == CameraType.Reflection || camera.cameraType == CameraType.Preview/* || camera.cameraType == CameraType.SceneView*/)
+                return;
+
+            // don't do reflections for the overlay cameras
+            UniversalAdditionalCameraData camData = camera.GetComponent<UniversalAdditionalCameraData>();
+            if (camData != null && camData.renderType == CameraRenderType.Overlay)
+                return;
+
+            UpdateReflectionCamera(camera);     // create or update reflected camera
+            PlanarReflectionTexture(camera);    // create and assign RenderTexture
+        }
+
+        private void OnFinishedRenderingPlanarReflCamera(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera != reflectionCamera)
+                return;
+
+            renderingPlanarReflections = false;
+
+            //PerformPostRenderOperations();
         }
 
         #endregion

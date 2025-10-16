@@ -149,9 +149,9 @@ Shader "Blur/Dual-Kawase Blur"
             {
                 float4 color = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, input.uv);
 
-                color.r = min(color.r, _MaxValue);
-                color.g = min(color.g, _MaxValue);
-                color.b = min(color.b, _MaxValue);
+                color.r = clamp(color.r, 0.0, _MaxValue);
+                color.g = clamp(color.g, 0.0, _MaxValue);
+                color.b = clamp(color.b, 0.0, _MaxValue);
 
                 return color;
             }

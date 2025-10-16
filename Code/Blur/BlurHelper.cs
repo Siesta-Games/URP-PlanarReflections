@@ -70,16 +70,23 @@ namespace SiestaGames.PlanarReflections
         /// <summary>
         /// Limits the color value using the 3rd pass (Pass 2) of the Dual-Kawase blur shader on the given render texture
         /// </summary>
-        public static void LimitColorValue(RenderTexture rt, Material blurMat, float maxValue)
+        public static void LimitColorValue(RenderTexture rt, RenderTexture finalTarget, Material blurMat, float maxValue)
         {
-            RenderTexture tempRT = RenderTexture.GetTemporary(rt.descriptor);
-
             blurMat.SetTexture(blitTextureId, rt);
             blurMat.SetFloat(maxValueId, maxValue);
-            Graphics.Blit(rt, tempRT, blurMat, 2);
-            Graphics.Blit(tempRT, rt);
+            if (finalTarget == rt)
+            {
+                RenderTexture tempRT = RenderTexture.GetTemporary(rt.descriptor);
 
-            RenderTexture.ReleaseTemporary(tempRT);
+                Graphics.Blit(rt, tempRT, blurMat, 2);
+                Graphics.Blit(tempRT, rt);
+
+                RenderTexture.ReleaseTemporary(tempRT);
+            }
+            else
+            {
+                Graphics.Blit(rt, finalTarget, blurMat, 2);
+            }
         }
     }
 

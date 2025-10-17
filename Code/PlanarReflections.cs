@@ -107,23 +107,37 @@ namespace SiestaGames.PlanarReflections
 
         #region Private Attributes
 
+        private bool enablePlanarReflections = true;
+
         // NOTE: [Barkley] Sometimes it's useful to see the textures in the editor
         private RenderTexture reflectionTexture = null;
         private RenderTexture[] reflTexBlur = null;
 
         private static Camera reflectionCamera;
-        private static bool renderingPlanarReflections = false;
+        private static bool isRenderingPlanarReflections = false;
         private Vector2Int oldReflectionTextureSize = new Vector2Int(0, 0);
         private Material dualKawaseBlurMat;
+
+        private GlobalKeyword planarReflEnabledKeyword;
 
         #endregion
 
         #region Properties
 
-        public static bool RenderingPlanarReflections { get { return renderingPlanarReflections; } }
+        public bool EnablePlanarReflections
+        {
+            get { return enablePlanarReflections; }
+            set
+            {
+                enablePlanarReflections = value;
+                Shader.SetKeyword(planarReflEnabledKeyword, enablePlanarReflections);
+            }
+        }
 
         public RenderTexture ReflectionTexture => reflectionTexture;
         public ReadOnlyCollection<RenderTexture> ReflectionTexsBlur => new ReadOnlyCollection<RenderTexture>(reflTexBlur);
+
+        public static bool IsRenderingPlanarReflections { get { return isRenderingPlanarReflections; } }
 
         #endregion
 
@@ -131,12 +145,7 @@ namespace SiestaGames.PlanarReflections
 
         private void OnEnable()
         {
-            RenderPipelineManager.beginCameraRendering += OnExecutePlanarReflections;
-            RenderPipelineManager.endCameraRendering += OnFinishedRenderingCamera;
-
-            if (dualKawaseBlurShader == null)
-                dualKawaseBlurShader = Shader.Find("Blur/Dual-Kawase Blur");
-            dualKawaseBlurMat = new Material(dualKawaseBlurShader);
+            Init();
         }
 
         // Cleanup all the objects we possibly have created
@@ -153,7 +162,8 @@ namespace SiestaGames.PlanarReflections
 
         private void Update()
         {
-            RequestReflectionCameraRender();
+            if (enablePlanarReflections)
+                RequestReflectionCameraRender();
         }
 
         private void OnDrawGizmos()
@@ -186,6 +196,28 @@ namespace SiestaGames.PlanarReflections
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Initialization
+        /// </summary>
+        public void Init()
+        {
+            // make sure the material is created
+            if (dualKawaseBlurShader == null)
+                dualKawaseBlurShader = Shader.Find("Blur/Dual-Kawase Blur");
+            if (dualKawaseBlurMat == null)
+                dualKawaseBlurMat = new Material(dualKawaseBlurShader);
+
+            // register to the camera rendering events
+            RenderPipelineManager.beginCameraRendering -= OnExecutePlanarReflections;
+            RenderPipelineManager.beginCameraRendering += OnExecutePlanarReflections;
+            RenderPipelineManager.endCameraRendering -= OnFinishedRenderingCamera;
+            RenderPipelineManager.endCameraRendering += OnFinishedRenderingCamera;
+
+            // set the keyword
+            planarReflEnabledKeyword = GlobalKeyword.Create("_PLANAR_REFLECTIONS_ENABLED");
+            Shader.SetKeyword(planarReflEnabledKeyword, enablePlanarReflections);
+        }
 
         /// <summary>
         /// Destroys an object either using Destroy or DestroyImmediate depending on whether we're in the editor or not
@@ -251,7 +283,7 @@ namespace SiestaGames.PlanarReflections
             var data = new PlanarReflectionSettingData(); // save quality settings and lower them for the planar reflections
             data.Set(); // set quality settings
 
-            renderingPlanarReflections = true;
+            isRenderingPlanarReflections = true;
             if (BeginPlanarReflections != null)
                 BeginPlanarReflections(reflectionCamera);                  // callback Action for PlanarReflection
 
@@ -260,7 +292,7 @@ namespace SiestaGames.PlanarReflections
             Assert.IsTrue(UniversalRenderPipeline.SupportsRenderRequest<UniversalRenderPipeline.SingleCameraRequest>(reflectionCamera, requestData), "Error! The system doesn't support the render request of another camera?!");
             UniversalRenderPipeline.SubmitRenderRequest(reflectionCamera, requestData);
 
-            renderingPlanarReflections = false;
+            isRenderingPlanarReflections = false;
 
             data.Restore(); // restore the quality settings
             Shader.SetGlobalTexture(PlanarReflectionTextureId, reflectionTexture);  // Assign texture to water shader

@@ -258,10 +258,15 @@ void frag(
 
     InitializeBakedGIData(unpacked, inputData);
     
+#if defined(_PLANAR_REFLECTIONS_ENABLED)
     PlanarReflInfo planarReflInfo;
     InitializePlanarReflData(inputData, surfaceDescription, planarReflInfo);
     
     half4 color = PlanarReflUniversalFragmentPBR(inputData, surface, planarReflInfo);
+#else
+    half4 color = UniversalFragmentPBR(inputData, surface);
+#endif
+    
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
 
     color.a = OutputAlpha(color.a, isTransparent);

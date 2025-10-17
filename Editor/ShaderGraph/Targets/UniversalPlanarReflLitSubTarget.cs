@@ -375,7 +375,7 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                     renderStates = CoreRenderStates.UberSwitchedRenderState(target, blendModePreserveSpecular),
                     pragmas = pragmas ?? CorePragmas.Forward,     // NOTE: SM 2.0 only GL
                     defines = new DefineCollection() { },
-                    keywords = new KeywordCollection() { keywords },
+                    keywords = new KeywordCollection() { keywords, LitKeywords.EnablePlanarReflections },
                     includes = PlanarReflLitIncludes.Forward,
 
                     // Custom Interpolator Support
@@ -720,6 +720,16 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
                 type = KeywordType.Boolean,
                 definition = KeywordDefinition.ShaderFeature,
                 scope = KeywordScope.Local,
+            };
+
+            public static readonly KeywordDescriptor EnablePlanarReflections = new KeywordDescriptor()
+            {
+                displayName = "Enable Planar Reflections",
+                referenceName = "_PLANAR_REFLECTIONS_ENABLED",
+                type = KeywordType.Boolean,
+                definition = KeywordDefinition.MultiCompile,
+                scope = KeywordScope.Global,
+                stages = KeywordShaderStage.Fragment,
             };
 
             public static readonly KeywordCollection Forward = new KeywordCollection

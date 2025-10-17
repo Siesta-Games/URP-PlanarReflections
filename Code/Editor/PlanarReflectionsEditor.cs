@@ -33,10 +33,16 @@ namespace SiestaGames.PlanarReflections
 			// Show the default inspector
 			base.OnInspectorGUI();
 
-			EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
 
-			// show the reflection render texture if possible
-			RenderTexture rt = planarRefl.ReflectionTexture;
+            bool newEnable = EditorGUILayout.Toggle("Enable Planar Reflections", planarRefl.EnablePlanarReflections);
+            if (newEnable != planarRefl.EnablePlanarReflections)
+                planarRefl.EnablePlanarReflections = newEnable;
+
+            EditorGUILayout.Separator();
+
+            // show the reflection render texture if possible
+            RenderTexture rt = planarRefl.ReflectionTexture;
 			if (rt != null)
 			{
 				showPlanarReflTex = EditorGUILayout.BeginFoldoutHeaderGroup(showPlanarReflTex, "Reflection Texture");

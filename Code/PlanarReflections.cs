@@ -56,27 +56,38 @@ namespace SiestaGames.PlanarReflections
             private readonly int maxLoD;
             private readonly float lodBias;
 
-            public PlanarReflectionSettingData()
+            private bool restoreSsao;
+            private readonly ScriptableRendererFeature ssaoFeature;
+
+			public PlanarReflectionSettingData(ScriptableRendererFeature ssaoFeature)
             {
                 fog = RenderSettings.fog;
                 maxLoD = QualitySettings.maximumLODLevel;
                 lodBias = QualitySettings.lodBias;
-            }
+
+                this.ssaoFeature = ssaoFeature;
+				restoreSsao = ssaoFeature != null && ssaoFeature.isActive;
+			}
 
             public void Set()
             {
-                GL.invertCulling = true;
+				GL.invertCulling = true;
                 RenderSettings.fog = false; // disable fog for now as it's incorrect with projection
                 QualitySettings.maximumLODLevel = 1;
                 QualitySettings.lodBias = lodBias * 0.5f;
+
+                restoreSsao = ssaoFeature != null && ssaoFeature.isActive;
+                ssaoFeature?.SetActive(false);
             }
 
-            public void Restore()
+			public void Restore()
             {
                 GL.invertCulling = false;
                 RenderSettings.fog = fog;
                 QualitySettings.maximumLODLevel = maxLoD;
                 QualitySettings.lodBias = lodBias;
+
+                ssaoFeature?.SetActive(restoreSsao);
             }
         }
 
@@ -93,6 +104,8 @@ namespace SiestaGames.PlanarReflections
         private readonly int PlanarReflectionTexture5Id = Shader.PropertyToID("_PlanarReflectionTexture5");
 
         public PlanarReflectionSettings settings = new PlanarReflectionSettings();
+
+        public ScriptableRendererFeature ssaoFeature;
 
         public int urpCamRendererIndex = -1;
         public float planeOffset = 0.01f;
@@ -280,7 +293,7 @@ namespace SiestaGames.PlanarReflections
             //UpdateReflectionCamera(camera);     // create or update reflected camera
             //PlanarReflectionTexture(camera);    // create and assign RenderTexture
 
-            var data = new PlanarReflectionSettingData(); // save quality settings and lower them for the planar reflections
+            var data = new PlanarReflectionSettingData(ssaoFeature); // save quality settings and lower them for the planar reflections
             data.Set(); // set quality settings
 
             isRenderingPlanarReflections = true;

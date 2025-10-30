@@ -516,6 +516,7 @@ namespace SiestaGames.PlanarReflections
             Vector2Int res = ReflectionResolution(cam, UniversalRenderPipeline.asset.renderScale);
             if (reflectionTexture != null && (res.x != reflectionTexture.width || res.y != reflectionTexture.height))
             {
+                Debug.LogFormat("Releasing planar reflection render textures because resolution changed: {0}x{1} (old {2}x{3})", res.x, res.y, reflectionTexture.width, reflectionTexture.height);
                 //RenderTexture.ReleaseTemporary(reflectionTexture);
                 reflectionTexture.DiscardContents();
                 reflectionTexture.Release();
@@ -532,6 +533,8 @@ namespace SiestaGames.PlanarReflections
 
             if (reflectionTexture == null)
             {
+                Debug.LogFormat("Creating new planar reflection render textures: {0}x{1}", res.x, res.y);
+
                 //reflectionTexture = RenderTexture.GetTemporary(res.x, res.y, 16,
                 //    GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
                 bool useHdr10 = RenderingUtils.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float);
@@ -567,7 +570,7 @@ namespace SiestaGames.PlanarReflections
         private void OnExecutePlanarReflections(ScriptableRenderContext context, Camera camera)
         {
             // we dont want to render planar reflections in reflections or previews
-            if (camera.cameraType == CameraType.Reflection || camera.cameraType == CameraType.Preview || camera == reflectionCamera)
+            if (camera.cameraType == CameraType.Reflection || camera.cameraType == CameraType.Preview || camera == reflectionCamera || !enablePlanarReflections)
                 return;
 
             // don't do reflections for the overlay cameras

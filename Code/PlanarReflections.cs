@@ -107,6 +107,7 @@ namespace SiestaGames.PlanarReflections
 
         public ScriptableRendererFeature ssaoFeature;
 
+        public LayerMask validCamLayers = -1;
         public int urpCamRendererIndex = -1;
         public float planeOffset = 0.01f;
 
@@ -277,6 +278,12 @@ namespace SiestaGames.PlanarReflections
                     reflTexBlur[i] = null;
                 }
                 reflTexBlur = null;
+            }
+
+            if (dualKawaseBlurMat != null)
+            {
+                SafeDestroy(dualKawaseBlurMat);
+                dualKawaseBlurMat = null;
             }
         }
 
@@ -495,13 +502,18 @@ namespace SiestaGames.PlanarReflections
         /// <summary>
         /// Returns the resolution to use for the reflection texture
         /// </summary>
-        /// <param name="cam"></param>
-        /// <param name="scale"></param>
-        /// <returns></returns>
         private Vector2Int ReflectionResolution(Camera cam, float scale)
         {
-            int x = (int)(cam.pixelWidth * scale * GetScaleValue());
-            int y = (int)(cam.pixelHeight * scale * GetScaleValue());
+            return ReflectionResolution(cam.pixelWidth, cam.pixelHeight, scale);
+        }
+
+        /// <summary>
+        /// Returns the resolution to use for the reflection texture
+        /// </summary>
+        private Vector2Int ReflectionResolution(int width, int height, float scale)
+        {
+            int x = (int)(width * scale * GetScaleValue());
+            int y = (int)(height * scale * GetScaleValue());
 
             return new Vector2Int(x, y);
         }
@@ -510,10 +522,10 @@ namespace SiestaGames.PlanarReflections
         /// Prepares the reflection texture for the planar reflections
         /// </summary>
         /// <param name="cam"></param>
-        private void PlanarReflectionTexture(Camera cam)
+        private void PlanarReflectionTexture(int width, int height)
         {
             // if the size changes release teh reflection texture
-            Vector2Int res = ReflectionResolution(cam, UniversalRenderPipeline.asset.renderScale);
+            Vector2Int res = ReflectionResolution(width, height, UniversalRenderPipeline.asset.renderScale);
             if (reflectionTexture != null && (res.x != reflectionTexture.width || res.y != reflectionTexture.height))
             {
                 Debug.LogFormat("Releasing planar reflection render textures because resolution changed: {0}x{1} (old {2}x{3})", res.x, res.y, reflectionTexture.width, reflectionTexture.height);
@@ -557,6 +569,33 @@ namespace SiestaGames.PlanarReflections
             reflectionCamera.targetTexture = reflectionTexture;
         }
 
+        /// <summary>
+        /// Assigns the textures to the shader global variables
+        /// </summary>
+        private void AssignShaderTextures()
+        {
+            Shader.SetGlobalTexture(PlanarReflectionTextureId, reflectionTexture);
+
+            if (blurFinalRT)
+            {
+                // assign the blurred textures to the global shader parameters
+                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflTexBlur[0]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflTexBlur[1]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflTexBlur[2]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflTexBlur[3]);
+                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflTexBlur[4]);
+            }
+            else
+            {
+                // set the reflection texture to all levels of reflection texture
+                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflectionTexture);
+                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflectionTexture);
+            }
+        }
+
         #endregion
 
         #region Callbacks
@@ -573,14 +612,19 @@ namespace SiestaGames.PlanarReflections
             if (camera.cameraType == CameraType.Reflection || camera.cameraType == CameraType.Preview || camera == reflectionCamera || !enablePlanarReflections)
                 return;
 
+            // ensure the layer of the camera is valid
+            int camLayerAsMask = 1 << camera.gameObject.layer;
+            if ((validCamLayers & camLayerAsMask) == 0)
+                return;
+
             // don't do reflections for the overlay cameras
             UniversalAdditionalCameraData camData = camera.GetComponent<UniversalAdditionalCameraData>();
             if (camData != null && camData.renderType == CameraRenderType.Overlay)
                 return;
 
             // create or update the reflection camera to the given camera
-            UpdateReflectionCamera(camera);     // create or update reflected camera
-            PlanarReflectionTexture(camera);    // create and assign RenderTexture
+            UpdateReflectionCamera(camera);                                     // create or update reflected camera
+            PlanarReflectionTexture(camera.pixelWidth, camera.pixelHeight);     // create and assign RenderTexture
         }
 
         private void OnFinishedRenderingCamera(ScriptableRenderContext context, Camera camera)
@@ -605,24 +649,10 @@ namespace SiestaGames.PlanarReflections
                 // do the blurring for further roughness levels
                 BlurHelper.DualKawaseBlur(reflectionTexture, ref reflTexBlur, dualKawaseBlurMat, 1.0f);
 
-                // assign the blurred textures to the global shader parameters
-                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflTexBlur[0]);
-                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflTexBlur[1]);
-                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflTexBlur[2]);
-                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflTexBlur[3]);
-                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflTexBlur[4]);
-
                 Profiler.EndSample();
             }
-            else
-            {
-                // set the reflection texture to all levels of reflection texture
-                Shader.SetGlobalTexture(PlanarReflectionTexture1Id, reflectionTexture);
-                Shader.SetGlobalTexture(PlanarReflectionTexture2Id, reflectionTexture);
-                Shader.SetGlobalTexture(PlanarReflectionTexture3Id, reflectionTexture);
-                Shader.SetGlobalTexture(PlanarReflectionTexture4Id, reflectionTexture);
-                Shader.SetGlobalTexture(PlanarReflectionTexture5Id, reflectionTexture);
-            }
+
+            AssignShaderTextures();
         }
 
         #endregion

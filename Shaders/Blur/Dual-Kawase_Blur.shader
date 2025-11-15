@@ -50,12 +50,19 @@ Shader "Blur/Dual-Kawase Blur"
 
         ENDHLSL
 
-        Tags { "RenderType"="Opaque" "RenderTexture"="True" }
+        Tags 
+        { 
+            "RenderType"="Opaque" 
+            "RenderPipeline"="UniversalPipeline" 
+        }
         LOD 100
         Pass        // Pass 0: down sample
         {
+            // NOTE: [Barkley] ZTest Always is a must have for post-processing shaders (on Xbox it may fail causing graphic glitches)
             Name "Dual-Kawase Blur Down"
-            ZWrite Off Cull Off
+            ZTest Always
+            ZWrite Off
+            Cull Off
             Fog { Mode off }
 
             HLSLPROGRAM
@@ -93,8 +100,11 @@ Shader "Blur/Dual-Kawase Blur"
 
         Pass        // Pass 1: up sample
         {
+            // NOTE: [Barkley] ZTest Always is a must have for post-processing shaders (on Xbox it may fail causing graphic glitches)
             Name "Dual-Kawase Blur Up"
-            ZWrite Off Cull Off
+            ZTest Always
+            ZWrite Off 
+            Cull Off
             Fog { Mode off }
 
             HLSLPROGRAM
@@ -136,8 +146,11 @@ Shader "Blur/Dual-Kawase Blur"
 
         Pass        //< Pass 2: Simple pass to limit the value of pixels
         {
+            // NOTE: [Barkley] ZTest Always is a must have for post-processing shaders (on Xbox it may fail causing graphic glitches)
             Name "Limit Color Values"
-            ZWrite Off Cull Off
+            ZTest Always
+            ZWrite Off 
+            Cull Off
             Fog { Mode off }
 
             HLSLPROGRAM

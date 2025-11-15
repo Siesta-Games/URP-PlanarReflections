@@ -551,16 +551,20 @@ namespace SiestaGames.PlanarReflections
                 //    GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
                 bool useHdr10 = RenderingUtils.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float);
                 RenderTextureFormat hdrFormat = useHdr10 ? RenderTextureFormat.RGB111110Float : RenderTextureFormat.DefaultHDR;
-                reflectionTexture = new RenderTexture(res.x, res.y, 16,
-                    GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
+                GraphicsFormat graphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true);
+                GraphicsFormat depthStencilFormat = GraphicsFormatUtility.GetDepthStencilFormat(16);
+                Debug.LogFormat("Planar Reflection RT formats: Graphics = {0}, DepthStencil = {1}", graphicsFormat, depthStencilFormat);
+
+                reflectionTexture = new RenderTexture(res.x, res.y, graphicsFormat, depthStencilFormat, 0);
                 reflectionTexture.name = "Planar Reflection RT";
                 reflectionTexture.useMipMap = false;
                 reflectionTexture.autoGenerateMips = false;
 
+                GraphicsFormat depthStencilFormatBlur = GraphicsFormatUtility.GetDepthStencilFormat(0);
                 reflTexBlur = new RenderTexture[5];
                 for (int i = 0; i < reflTexBlur.Length; ++i)
                 {
-                    reflTexBlur[i] = new RenderTexture(res.x / 2, res.y / 2, 0, GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
+                    reflTexBlur[i] = new RenderTexture(res.x / 2, res.y / 2, graphicsFormat, depthStencilFormatBlur, 0);
                     reflTexBlur[i].name = $"Planar Reflection RT Blur {i + 1}";
                     reflTexBlur[i].useMipMap = false;
                     reflTexBlur[i].autoGenerateMips = false;
